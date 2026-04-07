@@ -129,16 +129,16 @@ In distributed systems, coordinating multi-step transactions across independent 
 │ • workflows table    │	  │  (Port 8002)    │  │ (Port 8003)     │  │ (Port 8004)      │
 │ • workflow_steps tbl │	  │                 │  │                 │  │                  │
 └──────────────────────┘	  │ • Deduct Fund   │  │ • Reserve Stock │  │ • Send Emails    │
-							              │ • Refund        │  │ • Release Stock │  │ • SMTP Gateway   │
-							              │ • Redis Cache   │  │ • Redis Cache   │  │ • Async Threads  │
-							              │ • User Mgmt     │  │ • Product Mgmt  │  │                  │
-							              └────────┬────────┘  └────────┬────────┘  └────────┬─────────┘
-									                   │                    │                    │
-								                	   ▼                    ▼                    ▼
-							             ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐
-							             │ Payment DB      │  │ Inventory DB    │  │ Notification DB  │
-							             │ (MySQL:3307)    │  │ (MySQL:3308)    │  │ (MySQL:3309)     │
-							             └─────────────────┘  └─────────────────┘  └──────────────────┘
+                              │ • Refund        │  │ • Release Stock │  │ • SMTP Gateway   │
+                              │ • Redis Cache   │  │ • Redis Cache   │  │   │
+                              │ • User Mgmt     │  │ • Product Mgmt  │  │                  │
+                              └────────┬────────┘  └────────┬────────┘  └────────┬─────────┘
+								       │                    │                    │
+								       ▼                    ▼                    ▼
+							   ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐
+							   │ Payment DB      │  │ Inventory DB    │  │ Notification DB  │
+							   │ (MySQL:3307)    │  │ (MySQL:3308)    │  │ (MySQL:3309)     │
+							   └─────────────────┘  └─────────────────┘  └──────────────────┘
                 
 
 
