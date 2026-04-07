@@ -1,0 +1,204 @@
+version: '3.8'
+
+networks:
+  sentinel-network:
+    driver: bridge
+
+volumes:
+  payment-mysql-data:
+  inventory-mysql-data:
+  notification-mysql-data:
+  orchestrator-mysql-data:
+
+services:
+  #--------- Infrastructure Services --------------
+  service-registry:
+    build:
+      context: ./service-registry
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - sentinel-network
+
+  config-server:
+    build:
+      context: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      - service-registry
+    networks:
+      - sentinel-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SERVICE_REGISTRY_HOST: service-registry
+      REDIS_HOST: redis
+      SECRET_TOKEN: Q2hhbmdlVGhpc0V4YW1wbGVTZWNyZXREZW1vMTIzNDU2Nzg5MDEyMzQ1Ng
+    depends_on:
+      - service-registry
+      - redis
+      - config-server
+    networks:
+      - sentinel-network
+    restart: always
+
+  # ------------- Databases & Caching -------------
+  payment-mysql:
+    image: mysql:8.0
+    container_name: payment-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root1
+      MYSQL_DATABASE: payment_db
+    volumes:
+      - payment-mysql-data:/var/lib/mysql
+    networks:
+      - sentinel-network
+
+  inventory-mysql:
+    image: mysql:8.0
+    container_name: inventory-mysql
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root2
+      MYSQL_DATABASE: inventory_db
+    volumes:
+      - inventory-mysql-data:/var/lib/mysql
+    networks:
+      - sentinel-network
+
+  notification-mysql:
+    image: mysql:8.0
+    container_name: notification-mysql
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root3
+      MYSQL_DATABASE: notification_db
+    volumes:
+      - notification-mysql-data:/var/lib/mysql
+    networks:
+      - sentinel-network
+
+  orchestrator-mysql:
+    image: mysql:8.0
+    container_name: orchestrator-mysql
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root4
+      MYSQL_DATABASE: orchestrator_db
+    volumes:
+      - orchestrator-mysql-data:/var/lib/mysql
+    networks:
+      - sentinel-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: sentinel-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - sentinel-network
+
+  # -------------- Functional Services -------------
+  payment-service:
+    build:
+      context: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8002:8002"
+    environment:
+      DB_HOST: payment-mysql
+      DB_USERNAME: root
+      DB_PASSWORD: root1
+      REDIS_HOST: redis
+      SERVICE_REGISTRY_HOST: service-registry
+      SECRET_TOKEN: Q2hhbmdlVGhpc0V4YW1wbGVTZWNyZXREZW1vMTIzNDU2Nzg5MDEyMzQ1Ng
+      CONFIG_SERVER_HOST: config-server
+    depends_on:
+      - service-registry
+      - config-server
+      - payment-mysql
+      - redis
+    networks:
+      - sentinel-network
+    restart: always
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+    container_name: inventory-service
+    ports:
+      - "8003:8003"
+    environment:
+      DB_HOST: inventory-mysql
+      DB_USERNAME: root
+      DB_PASSWORD: root2
+      REDIS_HOST: redis
+      SERVICE_REGISTRY_HOST: service-registry
+      SECRET_TOKEN: Q2hhbmdlVGhpc0V4YW1wbGVTZWNyZXREZW1vMTIzNDU2Nzg5MDEyMzQ1Ng
+      CONFIG_SERVER_HOST: config-server
+    depends_on:
+      - service-registry
+      - config-server
+      - inventory-mysql
+      - redis
+    networks:
+      - sentinel-network
+    restart: always
+
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8004:8004"
+    environment:
+      DB_HOST: notification-mysql
+      DB_USERNAME: root
+      DB_PASSWORD: root3
+      #use your email
+      EMAIL_ID: your_email@gmail.com
+       #use your email password
+      PASSWORD_FOR_EMAIL_ID: your_app_password
+      SERVICE_REGISTRY_HOST: service-registry
+      CONFIG_SERVER_HOST: config-server
+    depends_on:
+      - service-registry
+      - config-server
+      - notification-mysql
+    networks:
+      - sentinel-network
+    restart: always
+
+  sentinel-orchestrator-service:
+    build:
+      context: ./sentinel-orchestrator-service
+    container_name: sentinel-orchestrator-service
+    ports:
+      - "8001:8001"
+    environment:
+      DB_HOST: orchestrator-mysql
+      DB_USERNAME: root
+      DB_PASSWORD: root4
+      SERVICE_REGISTRY_HOST: service-registry
+      SECRET_TOKEN: Q2hhbmdlVGhpc0V4YW1wbGVTZWNyZXREZW1vMTIzNDU2Nzg5MDEyMzQ1Ng
+      CONFIG_SERVER_HOST: config-server
+    depends_on:
+      - service-registry
+      - config-server
+      - orchestrator-mysql
+    networks:
+      - sentinel-network
+    restart: always
