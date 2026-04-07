@@ -81,7 +81,7 @@ In distributed systems, coordinating multi-step transactions across independent 
 ## 🏗️ Architecture
 
 ### System Architecture Diagram
-
+```bash
 ┌─────────────────────────────────���───────────────────────────────────┐
 │                         CLIENT APPLICATIONS                             │
 └──────────────────────────────────┬──────────────────────────────────────┘
@@ -159,9 +159,9 @@ In distributed systems, coordinating multi-step transactions across independent 
 │  └──────────────┘    └──────────────┘    └──────────────┘    └──────────────────┘   │
 │                                                                                     │
 └─────────────────────────────────────────────────────────────────────────────────────┘
-
+```
 ### Workflow Execution Flow
-
+```bash
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                      WORKFLOW LIFECYCLE                                     │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -244,7 +244,7 @@ In distributed systems, coordinating multi-step transactions across independent 
    │ • Retry RETRY_QUERY workflows        │
    │ • Auto-recovery capability           │
    └─────────────────────────────────────┘
-
+```
 ---
 
 ## 🛠️ Technology Stack
@@ -300,7 +300,7 @@ In distributed systems, coordinating multi-step transactions across independent 
 ---
 
 ## 📁 Project Structure
-
+```bash
 sentinel-distributed-saga-orchestrator-microservices/
 │
 ├── api-gateway/                             # API Gateway Service
@@ -404,7 +404,7 @@ sentinel-distributed-saga-orchestrator-microservices/
 ---
 ## 🎯 Services Overview
 
-### 1. **API Gateway** (Port 8080)
+### 1. API Gateway (Port 8080)
 **Purpose**: Single entry point for all client requests
 
 **Key Responsibilities**:
@@ -417,7 +417,7 @@ sentinel-distributed-saga-orchestrator-microservices/
 **Tech**: Spring Cloud Gateway (Reactive WebFlux)
 
 ---
-### 2. **Sentinel Orchestrator Service** (Port 8001, `/workflow`)
+### 2. Sentinel Orchestrator Service (Port 8001, `/workflow`)
 **Purpose**: Central state machine orchestrating distributed saga workflows
 
 **Key Responsibilities**:
@@ -450,7 +450,7 @@ GET    /workflow/status/{status}        # List workflows by status
 - ✅ Comprehensive Resilience: 5 circuit breakers, bulkhead, rate limiting
 
 ---
-### 3. **Payment Service** (Port 8002, `/payment`)
+### 3. Payment Service (Port 8002, `/payment`)
 **Purpose**: Handle payment processing and user account management
 
 **Key Responsibilities**:
@@ -489,7 +489,7 @@ GET    /payment/compensate/{workflowId}  # Refund payment
 - ✅ Fault Tolerance: Resilience4j integration
 
 ---
-### 4. **Inventory Service** (Port 8003, `/inventory`)
+### 4. Inventory Service (Port 8003, `/inventory`)
 **Purpose**: Manage products and stock inventory
 
 **Key Responsibilities**:
@@ -524,7 +524,7 @@ GET    /inventory/reservation/{id}       # Get reservation
 - ✅ Status Enums: AVAILABLE, RESERVATION, OUT_OF_STOCK
 
 ---
-### 5. **Notification Service** (Port 8004, `/notification`)
+### 5. Notification Service (Port 8004, `/notification`)
 **Purpose**: Send email notifications for workflow events
 
 **Key Responsibilities**:
@@ -557,7 +557,7 @@ POST   /notification/send/failed/outofstock  # Out-of-stock alert
 - ✅ Circuit Breaker: Protected downstream calls
 
 ---
-### 6. **Service Registry (Eureka)** (Port 8761)
+### 6. Service Registry (Eureka) (Port 8761)
 **Purpose**: Dynamic service registration and discovery
 
 **Features**:
@@ -567,7 +567,7 @@ POST   /notification/send/failed/outofstock  # Out-of-stock alert
 - ✅ Automatic deregistration
 
 ---
-### 7. **Config Server** (Port 8888)
+### 7. Config Server (Port 8888)
 **Purpose**: Centralized configuration management
 
 **Features**:
